@@ -102,7 +102,7 @@ https://www.statsmodels.org/stable/generated/statsmodels.tsa.statespace.sarimax.
 
 ## 5.1. Termos ARIMA
 
-Para encontrarmos os melhores modelos, precisamos conhecer os parâmetros, que s]ao chamados de "termos", as três principais são: p, d e q.
+Para encontrarmos os melhores modelos, precisamos conhecer os parâmetros, que são chamados de "termos", as três principais são: p, d e q.
 
 Existem diversas formas de encontrar estes termos e a quantidade de números, como funções ACF e PACF, mas aqui iremos aproveitar o poder de um programador e utilizar uma biblioteca para fazer esse teste pra gente.
 `import pmdarima as pm`
