@@ -1,6 +1,22 @@
+# ÍNDICE
+
+- [0.0. Fazendo previsões com ARIMA](#00-fazendo-previs-es-com-arima)
+- [1.0. Dataset](#10-dataset)
+  * [1.1. Carregando o dataset](#11-carregando-o-dataset)
+- [2.0. Inspecionando os Dados](#20-inspecionando-os-dados)
+- [3.0. Conferindo estacionariedade com Dickey-Fuller Test](#30-conferindo-estacionariedade-com-dickey-fuller-test)
+  * [3.1. Convertendo o dataset para estacionário](#31-convertendo-o-dataset-para-estacion-rio)
+- [4.0. Decomposição Sazonal](#40-decomposi--o-sazonal)
+- [5.0. Fazendo previsões](#50-fazendo-previs-es)
+  * [5.1. Termos ARIMA](#51-termos-arima)
+
+
+
 # 0.0. Fazendo previsões com ARIMA
 
 ARIMA no português significa auto-regressivo integrado de médias móveis. Utilizado em análises temporais, este modelo estatístico utiliza o passado para prever o futuro através de autocorrelação e média móveis. Modelos ARIMA são utilizados em alguns casos em que os dados mostram evidências de não estacionariedade.
+
+
 
 # 1.0. Dataset
 O dataset escolhido foi retirado do Kaggle, ele simula uma produção de eletricidade durante o período de 1985-01-01 até 2018-01-01, possuindo 397 entradas. Este conjunto de dados é referente a produção elétrica através contabilizada mensalmente, mas como é um modelo para estudo não existe muitos detalhes sobre sua origem.
@@ -17,6 +33,7 @@ Antes de iniciar qualquer etapa, é necessário indexar a sequência com as data
 
 * `parse_dates` transforma a coluna no formato datetime;
 * `index_col` faz com que essa coluna vire o index.
+* 
 
 # 2.0. Inspecionando os Dados
 A primeira coisa a ser feita depois de carregar os dados é inspeciona-lo, verificar se possui dados nulos, observações incomuns, padrões, mudanças ao longo do tempo e relações entre as variáveis. Podemos fazer isso com alguns comandos da biblioteca Pandas. Assim:
@@ -29,10 +46,14 @@ A primeira coisa a ser feita depois de carregar os dados é inspeciona-lo, verif
 
 As primeiras 5 linhas do dataset:
 
-![tabela01]('img/tabela01a.png')
-          
+![tabela01](img/tabela01a.png) 
+
 Para facilitar a visualização, vamos visualizar o gráfico, permitindo uma melhor visualização:
-![plot01]('img/fig01.png')
+![plot01](img/fig01.png)
+
+Como visto acima, a função logarítima não apresentou mudanças visíveis, então pegamos essa mesma função e fizemos o método de diferenciação, onde subtraimos o valor anterior com o posterior, utilizando a função .diff() da biblioteca pandas.
+
+ 
 
 # 3.0. Conferindo estacionariedade com Dickey-Fuller Test
 
@@ -47,12 +68,14 @@ Como p > 0.05 podemos dizer que não temos razão para rejeitar a hipótese nula
 ## 3.1. Convertendo o dataset para estacionário
 Para realizar essa transformação, seguiremos por duas etapas, iremos utilizar a biblioteca numpy para fazer uma transformação logarítmica e logo em seguida iremos fazer uma diferença entre o período de dois valores adjacentes.
 
-![tabela02]('img/tabela02.png')
+![tabela02](img/tabela02.png)
 
 Ao fazer esta diferença, é preciso lembrar que ela deixa valores nulos (NaN values), sendo importante utilizar o **dropna()** para remove-los:
 `df = df.dropna()`
 
 Com isso obtemos um valor de p de 3.25e-09, o que é pequeno o suficiente para rejeitarmos a hipótese nula e finalmente termos uma série estacionária.
+
+
 
 # 4.0. Decomposição Sazonal
 Aqui iremos responder as seguintes questões
@@ -60,9 +83,11 @@ Aqui iremos responder as seguintes questões
 * Tendência: os dados seguem uma tendência consistente para cima ou inclinação para baixo?
 * Ruído: existem pontos outlier ou valores ausentes que são não é consistente com o resto dos dados?
 Utilizando a biblioteca statsmodels podemos utilizar a `seasonal_decompose` para visualizar essas questões, mostrado no figura abaixo:
-![plot02]('img/fig02.png')
+![plot02](img/fig02.png)
 
 Temos um padrão cíclico, o que demonstra que certos períodos do mês temos uma alta produção energética e outros com baixa. Uma tendência para cima e poucos ruídos.
+
+
 
 # 5.0. Fazendo previsões
 Inicialmente vamos dividir o dataset em treino(train) e teste(test), para que possamos validar as nossas predições. No caso eu vou treinar com os dados do período de 1985 até 2016 e comparar os resultados obtidos com o período entre 2017 e 2018.
@@ -83,17 +108,19 @@ Existem diversas formas de encontrar estes termos e a quantidade de números, co
 `import pmdarima as pm`
 Para quem é familiarizado com machine learning, essa biblioteca opera como uma espécie de gridsearch, você coloca os termos que deseja testar e ela vai fazendo combinações até encontrar a melhor resposta, no caso do nosso modelo ARIMA foi esse daqui:
 
-![tabela03]('img/tabela01.png')
+![tabela03](img/tabela01.png)
 
 
 Para validar nosso modelo, iremos utilizar a métrica MAE (Mean Absolute Error) representa a média da diferença absoluta entre os valores reais e previstos no conjunto de dados. Ele mede a média dos resíduos no conjunto de dados.
 
-The Mean Absolute Error for ARIMA: 0.028
-The Mean Absolute Error for SARIMA: 0.033
+* The Mean Absolute Error for ARIMA: 0.028
 
-Nosso modelo ARIMA mostrou melhor desempenho.
+* The Mean Absolute Error for SARIMA: 0.033
+
+No caso, quanto menor o valor melhor nosso modelo, então se desconsiderarmos a sazionalidade, entregaremos um modelo mais eficiente nas previsões.
 
 Com o modelo pronto podemos fazer previsões:
 
-![plot04]('img/fig04.png') 
+![plot04](img/fig04.png) 
 
+A aba de 'Prediction' é o comparativo com o a dataset de teste que fizemos, ou seja, ele está ai para mostrar o quão próximo dos valores nosso modelo está. O 'Forecast' sim são previsões futuras do dataset como um todo.
